@@ -9,8 +9,11 @@ The manipulation of digital images has become a significant challenge in maintai
 
 **Secondary Goals**
 - Develop a user-friendly web application or browser plugin for demo.
-- Ensure the system supports various permissible image transformations such as grayscale, cropping, resizing without compromising integrity.
+- Ensure the system supports various permissible image transformations such as grayscale, cropping, and resizing without compromising integrity.
 - Provide a public-proving and public-verifying authentication system that is secure and reliable.
+
+### :hammer: Working Status
+Idea: In the first round of study, I've read through all the papers cited in references. It occurs to me that [image post-processing circuits](https://github.com/TrishaDatta/circom-circuits/tree/main) such as grayscaling, resizing, and cropping contain a few similar constraints that might be able to improve using recursive SNARK. My next step is to try using [Nova](https://github.com/microsoft/Nova) and compare it with the benchmarks in the papers. Moreover, the choices of hash function can be another aspect to optimize. I will continue the study on which combinations of them (e.g. Poseidon Hash + Lattice Hash) best fit the recursive SNARK.
 
 ### Milestones
 
@@ -19,10 +22,8 @@ The manipulation of digital images has become a significant challenge in maintai
 | :fast_forward:| Understanding and Preliminary Research | Gain a comprehensive understanding of current image authentication methods and their limitations. | Literature review and analysis of existing systems. | 2 weeks |
 | :fast_forward: | Theoretical Framework Development | Develop a theoretical framework for image authentication using Zero-Knowledge Proof. | Formulating the theoretical aspects of using PCD for image authentication and defining permissible image transformations. | 3 weeks |
 | :fast_forward: | Prototype Development | Create a working prototype that demonstrates the practical application of the theoretical framework. | Designing and implementing a prototype that supports a set of permissible transformations. | 4 weeks |
-| :fast_forward: | Testing and Evaluation | Rigorously test the prototype for various real-world scenarios and evaluate its performance. | Conducting comprehensive testing and evaluating the prototype’s efficiency. | 3 weeks |
+| :fast_forward: | Testing and Evaluation | Rigorously test the prototype for various real-world scenarios and evaluate its performance. | Conducting comprehensive testing and evaluating the prototype’s efficiency with benchmarks. | 3 weeks |
 | :fast_forward: | Finalization and Documentation | Finalize the prototype based on testing feedback and prepare comprehensive documentation. | Refining the prototype and preparing documentation and user manuals. | 2 weeks |
-
-
 
 
 ### References
