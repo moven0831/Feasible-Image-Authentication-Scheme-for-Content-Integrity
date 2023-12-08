@@ -1,0 +1,9 @@
+{
+  "name": "@zk-ia/circuits",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "compileCircuits": "node ./scripts/buildCircuits.mjs"
+  }
+}
