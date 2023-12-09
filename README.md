@@ -28,7 +28,7 @@ Idea: In the first round of study, I've read through all the papers cited in ref
 
 | Status | Milestone | Objective | Tasks | Duration|
 |-----------|-----------|-------|----------|--------|
-| :fast_forward:| Understanding and Preliminary Research | Gain a comprehensive understanding of current image authentication methods and their limitations. | Literature review and analysis of existing systems. | 2 weeks |
+| :white_check_mark:| Understanding and Preliminary Research | Gain a comprehensive understanding of current image authentication methods and their limitations. | Literature review and analysis of existing systems. | 2 weeks |
 | :fast_forward: | Theoretical Framework Development | Develop a theoretical framework for image authentication using Zero-Knowledge Proof. | Formulating the theoretical aspects of using PCD for image authentication and defining permissible image transformations. | 3 weeks |
 | :fast_forward: | Prototype Development | Create a working prototype that demonstrates the practical application of the theoretical framework. | Designing and implementing a prototype that supports a set of permissible transformations. | 4 weeks |
 | :fast_forward: | Testing and Evaluation | Rigorously test the prototype for various real-world scenarios and evaluate its performance. | Conducting comprehensive testing and evaluating the prototype’s efficiency with benchmarks. | 3 weeks |
