@@ -22,21 +22,29 @@ for (const file of oldFiles) {
     await fs.promises.rm(filePath, { recursive: true });
 }
 
-
 // run circom on files in circuit directory
 const files = await fs.promises.readdir(buildDir);
 for (const file of files) {
     if (path.extname(file) === '.circom') {
         const fileName = path.basename(file, '.circom');
         const filePath = path.join(buildDir, file);
-        const command = `circom ${filePath} --r1cs --wasm --output ${outDir}`;
+        const command = `circom ${filePath} --r1cs --wasm --c --output ${outDir} --prime vesta`;
         console.log(`Compiling ${file}...`);
-        await new Promise((rs, rj) =>
+        await new Promise((rs, rj) => {
             child_process.exec(command, (err, stdout, stderr) => {
-                if (err) rj(err)
-                else rs()
-            })
-        )
+                if (err) rj(err);
+                else rs();
+            });
+        });
+        // execute make in the generated directory
+        const generatedDir = path.join(outDir, `${fileName}_cpp`);
+        console.log(`Compiling ${fileName} C++ witness generator...`);
+        await new Promise((rs, rj) => {
+            child_process.exec(`make`, { cwd: generatedDir }, (err, stdout, stderr) => {
+                if (err) rj(err);
+                else rs();
+            });
+        });
     }
 }
 
