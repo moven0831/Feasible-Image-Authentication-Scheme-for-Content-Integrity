@@ -44,7 +44,9 @@ pub fn init_panic_hook() {
     console_error_panic_hook::set_once();
 }
 
-const WEBSITE_ROOT: &str = "https://effulgent-liger-07e9d0.netlify.app/";
+// TODO: add a test browser for this
+const WEBSITE_ROOT: &str = "http://localhost:8080/";
+// const WEBSITE_ROOT: &str = "https://effulgent-liger-07e9d0.netlify.app/";
 
 type G1 = pasta_curves::pallas::Point;
 type G2 = pasta_curves::vesta::Point;
