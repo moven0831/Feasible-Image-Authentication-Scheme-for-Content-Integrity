@@ -22,22 +22,21 @@ fn run_test(circuit_filepath: String, witness_gen_filepath: String) {
     );
     let iteration_count = 5;
     let root = current_dir().unwrap();
-
     let circuit_file = root.join(circuit_filepath);
     let r1cs = load_r1cs::<G1, G2>(&FileLocation::PathBuf(circuit_file));
     let witness_generator_file = root.join(witness_gen_filepath);
-
+    
     let mut private_inputs = Vec::new();
     for i in 0..iteration_count {
         let mut private_input = HashMap::new();
         private_input.insert("adder".to_string(), json!(i));
         private_inputs.push(private_input);
     }
-
-    let start_public_input = [F::<G1>::from(10), F::<G1>::from(10)];
-
+    
+    let start_public_input = [F::<G1>::from(10), F::<G1>::from(10)];    
+    // Create CRS
     let pp = create_public_params::<G1, G2>(r1cs.clone());
-
+    
     println!(
         "Number of constraints per step (primary circuit): {}",
         pp.num_constraints().0
@@ -56,6 +55,8 @@ fn run_test(circuit_filepath: String, witness_gen_filepath: String) {
         pp.num_variables().1
     );
 
+    // From Cpp file, encounter stdout: stderr: Signal not found
+    // uint Circom_CalcWit::getInputSignalHashPosition(u64): Assertion `false' failed.
     println!("Creating a RecursiveSNARK...");
     let start = Instant::now();
     let recursive_snark = create_recursive_circuit(
