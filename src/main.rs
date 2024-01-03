@@ -9,7 +9,10 @@ use nova_snark::{
     CompressedSNARK, PublicParams,
 };
 
-use serde_json::json;
+use pasta_curves::Fq;
+use serde_json::{json, Value};
+use image::GenericImageView;
+
 
 fn run_test(circuit_filepath: String, witness_gen_filepath: String) {
     type G1 = pasta_curves::pallas::Point;
@@ -20,24 +23,55 @@ fn run_test(circuit_filepath: String, witness_gen_filepath: String) {
         witness_gen_filepath,
         std::any::type_name::<G1>()
     );
-    let iteration_count = 5;
     let root = current_dir().unwrap();
-
     let circuit_file = root.join(circuit_filepath);
     let r1cs = load_r1cs::<G1, G2>(&FileLocation::PathBuf(circuit_file));
     let witness_generator_file = root.join(witness_gen_filepath);
 
-    let mut private_inputs = Vec::new();
-    for i in 0..iteration_count {
-        let mut private_input = HashMap::new();
-        private_input.insert("adder".to_string(), json!(i));
-        private_inputs.push(private_input);
-    }
+    // since we don't have public inputs, we use a foo value
+    let start_public_input = [F::<G1>::from(0)];
 
-    let start_public_input = [F::<G1>::from(10), F::<G1>::from(10)];
+    // load cropped image as private input
+    let image_name = "c2pa_mini";
+    let cropped_image_path = format!("src/bin/assets/{}_cropped.jpg", image_name);
+    let cropped_image = image::open(cropped_image_path).unwrap();
+    
+    // load original image as private input
+    let mut private_inputs: Vec<HashMap<String, Value>> = Vec::new();
+    let image_path = format!("src/bin/assets/{}.jpg", image_name);
+    let orig_image = image::open(image_path).unwrap();
+    
+    // create private inputs as (r, g, b) for each pixel in original image
+    println!("Loading original image as private input...");
+    let mut orig_input: HashMap<String, Value> = HashMap::new();
+    orig_input.insert(
+        "orig_img".to_string(),
+        json!(
+            orig_image.pixels().map(|p| {
+                vec![p.2[0], p.2[1], p.2[2]]
+            }).collect::<Vec<_>>()
+        )
+    );
+    private_inputs.push(orig_input);
 
+    // create private inputs as (r, g, b) for each pixel in cropped image
+    println!("Loading cropped image as private input...");
+    let mut cropped_input: HashMap<String, Value> = HashMap::new();
+    cropped_input.insert(
+        "new_img".to_string(),
+        json!(
+            cropped_image.pixels().map(|p| {
+                vec![p.2[0], p.2[1], p.2[2]]
+            }).collect::<Vec<_>>()
+        )
+    );
+    private_inputs.push(cropped_input);
+
+    // Create CRS
+    // TODO: This process takes took long and being killed by OS
+    println!("Creating a CRS...");
     let pp = create_public_params::<G1, G2>(r1cs.clone());
-
+    
     println!(
         "Number of constraints per step (primary circuit): {}",
         pp.num_constraints().0
@@ -46,7 +80,7 @@ fn run_test(circuit_filepath: String, witness_gen_filepath: String) {
         "Number of constraints per step (secondary circuit): {}",
         pp.num_constraints().1
     );
-
+    
     println!(
         "Number of variables per step (primary circuit): {}",
         pp.num_variables().0
@@ -55,7 +89,9 @@ fn run_test(circuit_filepath: String, witness_gen_filepath: String) {
         "Number of variables per step (secondary circuit): {}",
         pp.num_variables().1
     );
-
+    
+    // From Cpp file, encounter stdout: stderr: Signal not found
+    // uint Circom_CalcWit::getInputSignalHashPosition(u64): Assertion `false' failed.
     println!("Creating a RecursiveSNARK...");
     let start = Instant::now();
     let recursive_snark = create_recursive_circuit(
@@ -66,26 +102,27 @@ fn run_test(circuit_filepath: String, witness_gen_filepath: String) {
         &pp,
     )
     .unwrap();
-    println!("RecursiveSNARK creation took {:?}", start.elapsed());
+println!("RecursiveSNARK creation took {:?}", start.elapsed());
 
-    // TODO: empty?
-    let z0_secondary = [F::<G2>::from(0)];
+// TODO: empty?
+let z0_secondary = [F::<G2>::from(0)];
 
-    // verify the recursive SNARK
-    println!("Verifying a RecursiveSNARK...");
-    let start = Instant::now();
-    let res = recursive_snark.verify(&pp, iteration_count, &start_public_input, &z0_secondary);
-    println!(
+// verify the recursive SNARK
+println!("Verifying a RecursiveSNARK...");
+let iteration_count = 1;
+let start = Instant::now();
+let res = recursive_snark.verify(&pp, iteration_count, &start_public_input, &z0_secondary);
+println!(
         "RecursiveSNARK::verify: {:?}, took {:?}",
         res,
         start.elapsed()
     );
     assert!(res.is_ok());
-
+    
     // produce a compressed SNARK
     println!("Generating a CompressedSNARK using Spartan with IPA-PC...");
     let start = Instant::now();
-
+    
     let (pk, vk) = CompressedSNARK::<_, _, _, _, S<G1>, S<G2>>::setup(&pp).unwrap();
     let res = CompressedSNARK::<_, _, _, _, S<G1>, S<G2>>::prove(&pp, &pk, &recursive_snark);
     println!(
@@ -95,7 +132,7 @@ fn run_test(circuit_filepath: String, witness_gen_filepath: String) {
     );
     assert!(res.is_ok());
     let compressed_snark = res.unwrap();
-
+    
     // verify the compressed SNARK
     println!("Verifying a CompressedSNARK...");
     let start = Instant::now();
@@ -111,16 +148,15 @@ fn run_test(circuit_filepath: String, witness_gen_filepath: String) {
         start.elapsed()
     );
     assert!(res.is_ok());
+    /*
+    */
 }
 
 fn main() {
-    let circuit_name = "crop";
-
-    let circuit_filepath = format!("dist/zkSnarkBuild/{}.r1cs", circuit_name);
-    for witness_gen_filepath in [
-        format!("dist/zkSnarkBuild/{0}_cpp/{0}", circuit_name)
-        // format!("dist/zkSnarkBuild/{0}_js/{0}.wasm", circuit_name),
-    ] {
-        run_test(circuit_filepath.clone(), witness_gen_filepath);
-    }
+    let circuit_name = "crop_benchmark";
+    
+    let circuit_filepath = format!("circuits/dist/zkSnarkBuild/{}.r1cs", circuit_name);
+    let witness_gen_filepath = format!("circuits/dist/zkSnarkBuild/{0}_cpp/{0}", circuit_name);
+    
+    run_test(circuit_filepath.clone(), witness_gen_filepath);
 }
