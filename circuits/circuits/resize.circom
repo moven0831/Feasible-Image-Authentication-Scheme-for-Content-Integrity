@@ -2,8 +2,8 @@ pragma circom 2.1.0;
 
 
 template Resize(hOrig, wOrig, hNew, wNew) {
-    signal input orig[hOrig][wOrig];
-    signal input new[hNew][wNew];
+    signal input orig_img[hOrig][wOrig];
+    signal input new_img[hNew][wNew];
 
 	signal output n_check;
 
@@ -19,12 +19,12 @@ template Resize(hOrig, wOrig, hNew, wNew) {
 			var yRatioWeighted = ((hOrig - 1) * i) - (hNew - 1)*y_l;
 
 			var denom = (wNew - 1) * (hNew - 1);
-			var sum = orig[y_l][x_l] * (wNew - 1 - xRatioWeighted) * (hNew - 1 - yRatioWeighted)
-				+ orig[y_l][x_h] * xRatioWeighted * (hNew - 1 - yRatioWeighted)
-				+ orig[y_h][x_l] * yRatioWeighted * (wNew - 1 - xRatioWeighted)
-				+ orig[y_h][x_h] * xRatioWeighted * yRatioWeighted;
+			var sum = orig_img[y_l][x_l] * (wNew - 1 - xRatioWeighted) * (hNew - 1 - yRatioWeighted)
+				+ orig_img[y_l][x_h] * xRatioWeighted * (hNew - 1 - yRatioWeighted)
+				+ orig_img[y_h][x_l] * yRatioWeighted * (wNew - 1 - xRatioWeighted)
+				+ orig_img[y_h][x_h] * xRatioWeighted * yRatioWeighted;
 
-			new[i][j] * denom === sum;
+			new_img[i][j] * denom === sum;
 		}		
 	}
 	n_check <== 1;
