@@ -32,8 +32,8 @@ template CheckBrightness() {
 
 template Bright(n) {
 
-    signal input orig[n][3];
-    signal input new[n][3];
+    signal input orig_img[n][3];
+    signal input new_img[n][3];
     signal input squares[n][3][6];
    
     signal input positiveRemainder[n][3];
@@ -50,8 +50,8 @@ template Bright(n) {
     for (var i = 0; i < n; i++) {
           for (var j = 0; j < 3; j++) {
                checkBright[i][j] <== CheckBrightness()(
-                    alpha * orig[i][j] + posBeta - negBeta,
-                    new[i][j],
+                    alpha * orig_img[i][j] + posBeta - negBeta,
+                    new_img[i][j],
                     positiveRemainder[i][j] - negativeRemainder[i][j],
                     [
                          squares[i][j][0] * squares[i][j][0],

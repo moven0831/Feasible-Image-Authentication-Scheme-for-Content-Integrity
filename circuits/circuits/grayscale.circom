@@ -43,23 +43,26 @@ template LessEqThan(n) {
 }
 
 
-template GrayscaleChecker(n) {
-    signal input orig[n][3];
-    signal input gray[n];
+template GrayscaleChecker(hOrig, wOrig) {
+    signal input orig_img[hOrig][wOrig][3];
+    signal input gray_img[hOrig][wOrig];
 
     signal output n_check;
  
-    signal lt[n][2];
+    signal lt[hOrig][wOrig][2];
 
-    for (var i = 0; i < n; i++) {
-        var inter = 30 * orig[i][0] + 59 * orig[i][1] + 11 * orig[i][2];
+    for (var i = 0; i < hOrig; i++) {
+        for (var j = 0; j < wOrig; j++) {
+            var inter = 30 * orig_img[i][j][0] + 59 * orig_img[i][j][1] + 11 * orig_img[i][j][2];
 
-        lt[i][0] <== LessEqThan(16)([inter - 100 * gray[i], 100]);
-        lt[i][1] <== LessEqThan(16)([100 * gray[i] - inter, 100]);
+            lt[i][j][0] <== LessEqThan(16)([inter - 100 * gray_img[i][j], 100]);
+            lt[i][j][1] <== LessEqThan(16)([100 * gray_img[i][j] - inter, 100]);
 
-        lt[i] === [1, 1];
+            lt[i][j] === [1, 1];
+        }
     }
-    n_check <== n;
+
+    n_check <== hOrig * wOrig;
 }
 
-component main = GrayscaleChecker(8000);
+component main = GrayscaleChecker(1200, 768);
