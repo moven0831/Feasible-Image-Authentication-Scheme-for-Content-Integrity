@@ -32,7 +32,7 @@ fn run_test(circuit_filepath: String, witness_gen_filepath: String) {
     let start_public_input = [F::<G1>::from(0)];
 
     // load cropped image as private input
-    let image_name = "c2pa_mini";
+    let image_name = "c2pa_tiny";
     let cropped_image_path = format!("src/bin/assets/{}_cropped.jpg", image_name);
     let cropped_image = image::open(cropped_image_path).unwrap();
     
@@ -70,6 +70,12 @@ fn run_test(circuit_filepath: String, witness_gen_filepath: String) {
     // Create CRS
     // TODO: This process takes took long and being killed by OS
     println!("Creating a CRS...");
+    // print some basic stats about the circuit
+    println!("Number of constraints: {}", r1cs.constraints.len());
+    println!("Number of aux: {}", r1cs.num_aux);
+    println!("Number of inputs: {}", r1cs.num_inputs);
+    println!("Number of variables: {}", r1cs.num_variables);
+    
     let pp = create_public_params::<G1, G2>(r1cs.clone());
     
     println!(
