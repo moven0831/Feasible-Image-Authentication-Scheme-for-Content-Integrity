@@ -15,4 +15,8 @@ sudo apt install nasm
 # For macOS users
 brew install nlohmann-json
 brew install nasm
+
+# If you are using M1 chips, add this to your profile
+export CPATH="$HOMEBREW_PREFIX/include:$CPATH"
+export LIBRARY_PATH="$HOMEBREW_PREFIX/lib:$LIBRARY_PATH"
 ```
