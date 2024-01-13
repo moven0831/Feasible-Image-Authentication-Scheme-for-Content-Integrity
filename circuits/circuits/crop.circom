@@ -5,6 +5,9 @@ template Crop(hOrig, wOrig, hNew, wNew, hStartNew, wStartNew) {
     signal input orig_img[hOrig][wOrig][3];
     signal input new_img[hNew][wNew][3];
 
+	// dummy signal to check the needs of public inputs
+	signal input in1;
+
     signal output n_check;
 
     for (var i = 0; i <  hNew; i++) {
@@ -18,4 +21,4 @@ template Crop(hOrig, wOrig, hNew, wNew, hStartNew, wStartNew) {
 }
 
 // TODO: make new_img a public input
-component main = Crop(2048, 1365, 100, 100, 500, 500);
+component main {public [in1]} = Crop(2048, 1365, 100, 100, 500, 500);
