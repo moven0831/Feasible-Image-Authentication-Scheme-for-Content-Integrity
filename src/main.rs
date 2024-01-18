@@ -28,8 +28,8 @@ fn run_test(circuit_filepath: String, witness_gen_filepath: String) {
     let r1cs = load_r1cs::<G1, G2>(&FileLocation::PathBuf(circuit_file));
     let witness_generator_file = root.join(witness_gen_filepath);
 
-    // since we don't have public inputs, we use a foo value
-    let start_public_input = [F::<G1>::from(0)];
+    // use foo values to test the circuit
+    let start_public_input = [F::<G1>::from(5), F::<G1>::from(10)];
 
     // load cropped image as private input
     let image_name = "c2pa_tiny";

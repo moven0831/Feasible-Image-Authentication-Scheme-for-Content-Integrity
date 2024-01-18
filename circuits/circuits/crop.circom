@@ -21,4 +21,4 @@ template Crop(hOrig, wOrig, hNew, wNew, hStartNew, wStartNew) {
 }
 
 // TODO: make new_img a public input
-component main {public [in1]} = Crop(2048, 1365, 100, 100, 500, 500);
+component main {public [in1, in2]} = Crop(2048, 1365, 100, 100, 500, 500);
